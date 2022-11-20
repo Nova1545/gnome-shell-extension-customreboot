@@ -1,0 +1,1 @@
+gnome-extensions pack --extra-source=grub.js --extra-source=systemdBoot.js --extra-source=utils.js --force
