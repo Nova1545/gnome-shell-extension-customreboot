@@ -18,6 +18,11 @@ This extension needs permissions for gnome-shell to read your `/boot` partition,
 
 There is now a button in the dropdown to make `grub.conf` readable (Requires authorization)
 
+## Installing
+1. Download from [releases](https://github.com/Nova1545/gnome-shell-extension-customreboot/releases)
+2. Open a terminal where you downloaded the extension to and run `gnome-extensions install customreboot@nova1545.shell-extension.zip` 
+
+
 ## Systemd-boot
 
 It's able to set the one-shot default using [`bootctl set-oneshot ID`](https://www.freedesktop.org/software/systemd/man/bootctl.html#set-default%20ID).
