@@ -19,6 +19,10 @@ This extension needs permissions for gnome-shell to read your `/boot` partition,
 There is now a button in the dropdown to make `grub.conf` readable (Requires authorization)
 
 ## Installing
+Recommended:
+1. Download from [Gnome Extensions](https://extensions.gnome.org/extension/5542/custom-reboot/)
+
+Alternate Option:
 1. Download from [releases](https://github.com/Nova1545/gnome-shell-extension-customreboot/releases)
 2. Open a terminal where you downloaded the extension to and run `gnome-extensions install customreboot@nova1545.shell-extension.zip` 
 
