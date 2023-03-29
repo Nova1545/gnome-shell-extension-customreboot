@@ -76,7 +76,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
                                 
                             }
                         });
-                    }, (x === 0)? "pan-end-symbolic" : undefined);
+                    }, (title === defaultOpt)? "pan-end-symbolic" : undefined);
                     x++;
                 });
                 this.menu.addMenuItem(this._itemsSection);
