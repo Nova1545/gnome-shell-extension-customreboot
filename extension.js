@@ -17,7 +17,7 @@ const RebootQuickMenu = GObject.registerClass(
 class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
     _init() {
         super._init({
-            label: 'Reboot Into...',
+            label: 'Reboot Into',
             iconName: 'system-reboot-symbolic',
             toggleMode: false,
         });
@@ -46,7 +46,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
         // Set Menu Header
         this.menu.setHeader('system-reboot-symbolic', 'Boot Options',
-            'Grub');
+            'Reboot into the selected entry');
         
         // Add boot options to menu
         this.createBootMenu();
