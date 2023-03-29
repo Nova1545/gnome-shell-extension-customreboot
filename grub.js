@@ -42,6 +42,8 @@ async function getBootOptions() {
 
         let bootOptions = new Map();
 
+        let defualtEn = "";
+
         let file = Gio.file_new_for_path(cfgpath);
         let [suc, content] = file.load_contents(null);
         if (!suc) {
@@ -57,10 +59,15 @@ async function getBootOptions() {
         }
 
         let entryRx = /^menuentry ['"]([^'"]+)/;
+        let defaultRx = /(?<=set default=\")([A-Za-z- ()/0-9]*)(?=\")/
         lines.split('\n').forEach(l => {
             let res = entryRx.exec(l);
             if (res && res.length) {
-                bootOptions.set(res[1], res[1])
+                bootOptions.set(res[1], res[1]);
+            }
+            let def = defaultRx.exec(l);
+            if (def && def.length) {
+                defualtEn = def[0];
             }
         });
 
@@ -68,7 +75,9 @@ async function getBootOptions() {
             Utils._log(`${k} = ${v}`);
         });
 
-        return [bootOptions, bootOptions.keys().next().value];
+        if (defualtEn == "") defualtEn = bootOptions.keys().next().value;
+
+        return [bootOptions, defualtEn];
             
     } catch (e) {
         Utils._logWarning(e);
