@@ -72,7 +72,7 @@ async function getBootOptions() {
             throw new Error("Number of titles and ids do not match!");
         let bootOptions = new Map();
         for (let i = 0; i < titles.length; i++) {
-            bootOptions.set(titles[i], ids[i])
+            bootOptions.set(ids[i], titles[i])
         }
         bootOptions.forEach((v, k) => {
             Utils._log(`${k} = ${v}`);
