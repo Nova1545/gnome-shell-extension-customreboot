@@ -88,6 +88,23 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
                 this.menu.removeAll();
                 this.createBootMenu();
             });
+
+            Utils.getCurrentBootloader().isQuickRebootable().then(async result => {
+                if (!result) {
+                    this.menu.addAction('Enable Quick Reboot', async () => {
+                        await Utils.getCurrentBootloader().enableQuickReboot();
+                        this.menu.removeAll();
+                        this.createBootMenu();
+                    });
+                }
+                else {
+                    this.menu.addAction('Disable Quick Reboot', async () => {
+                        await Utils.getCurrentBootloader().disableQuickReboot();
+                        this.menu.removeAll();
+                        this.createBootMenu();
+                    });
+                }
+            });
         }).catch(() => {
             // Only do this if the current bootloader is grub
             if (Utils.getCurrentBootloaderType() === 1)

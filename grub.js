@@ -130,3 +130,89 @@ async function setReadable() {
         return false;
     }
 }
+
+/**
+ * enableQuickReboot
+ * 
+ * Copies a custom grub script to allow the extension to quickly reboot into another OS without waiting for grub's timeout
+ */
+async function enableQuickReboot() {
+    try {
+        let [status, user, stderr] = await Utils.execCommand(['/usr/bin/whoami'],);
+    
+        [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/cp', `/home/${user.trim()}/.local/share/gnome-shell/extensions/customreboot@nova1545/42_custom_reboot`, '/etc/grub.d/42_custom_reboot'],);
+        if (status !== 0) {
+            Utils._logWarning(`Failed to copy 42_custom_reboot to /etc/grub.d`);
+            return false;
+        }
+        Utils._log(`Copied 42_custom_reboot to /etc/grub.d`);
+
+        [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/chmod', '755', '/etc/grub.d/42_custom_reboot'],);
+        if (status !== 0) {
+            Utils._logWarning(`Failed to make /etc/grub.d/42_custom_reboot executable`);
+            return false;
+        }
+
+        [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/sbin/update-grub'],);
+        if (status !== 0) {
+            Utils._logWarning(`Failed to update grub`);
+            return false;
+        }
+
+        return true;
+    }
+    catch (e) {
+        Utils._logWarning(e);
+        return false;
+    }
+}
+
+/**
+ * disableQuickReboot
+ * 
+ * Removes the script used to allow the extension to quickly reboot into another OS without waiting for grub's timeout
+ */
+async function disableQuickReboot() {
+    try {
+        let [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/rm', '/etc/grub.d/42_custom_reboot'],);
+        if (status !== 0) {
+            Utils._logWarning(`Failed to remove /etc/grub.d/42_custom_reboot`);
+            return false;
+        }
+        Utils._log(`Removed /etc/grub.d/42_custom_reboot`);
+
+        [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/sbin/update-grub'],);
+        if (status !== 0) {
+            Utils._logWarning(`Failed to update grub`);
+            return false;
+        }
+
+        return true;
+    }
+    catch (e) {
+        Utils._logWarning(e);
+        return false;
+    }
+}
+
+/**
+ * IsQuickRebootable
+ * 
+ * Checks if /etc/grub.d/42_custom_reboot exists
+ */
+async function isQuickRebootable() {
+    try {
+        let [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/cat', '/etc/grub.d/42_custom_reboot'],);
+        if (status !== 0) {
+            Utils._logWarning(`/etc/grub.d/42_custom_reboot not found`);
+            return false;
+        }
+        Utils._log(`/etc/grub.d/42_custom_reboot found`);
+
+        return true;
+    }
+    catch (e) {
+        Utils._logWarning(e);
+        return false;
+    }
+}

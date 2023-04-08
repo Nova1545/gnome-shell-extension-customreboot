@@ -1,1 +1,1 @@
-gnome-extensions pack --extra-source=grub.js --extra-source=systemdBoot.js --extra-source=utils.js --force
+gnome-extensions pack --extra-source=grub.js --extra-source=systemdBoot.js --extra-source=42_custom_reboot --extra-source=utils.js --force
