@@ -1,0 +1,13 @@
+#! /bin/sh
+# This script installs the grub script for quick rebooting
+
+USER = $1
+
+# Move grub script file to the grub.d directory
+cp /home/$USER/.local/gnome-shell/extensions/customreboot@nova1545/42_custom_reboot /etc/grub.d/42_custom_reboot
+
+# Match permissions with the other grub scripts
+chmod 755 /etc/grub.d/42_custom_reboot
+
+# Regenerate grub.conf
+update-grub

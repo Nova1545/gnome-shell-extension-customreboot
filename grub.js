@@ -134,7 +134,7 @@ async function setReadable() {
 /**
  * enableQuickReboot
  * 
- * Copies a custom grub script to allow the extension to quickly reboot into another OS without waiting for grub's timeout
+ * Copies a custom grub script to allow the extension to quickly reboot into another OS
  */
 async function enableQuickReboot() {
     try {
