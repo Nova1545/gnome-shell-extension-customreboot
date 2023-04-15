@@ -1,0 +1,8 @@
+#! /bin/sh
+# This script remove the grub script used for quick rebooting
+
+# Delete the grub script
+rm /etc/grub.d/42_custom_reboot
+
+# Regenerate grub.conf
+update-grub
