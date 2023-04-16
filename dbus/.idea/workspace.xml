@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e8dbe17-1fb0-4a36-a7c8-73b6ae930076" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/bootloader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.vscode/tasks.json" beforeDir="false" afterPath="$PROJECT_DIR$/../.vscode/tasks.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../grub.js" beforeDir="false" afterPath="$PROJECT_DIR$/../grub.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pack.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../pack.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/../utils.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -132,7 +135,7 @@
       <workItem from="1681175756797" duration="830000" />
       <workItem from="1681258699454" duration="1473000" />
       <workItem from="1681570920447" duration="4902000" />
-      <workItem from="1681663192853" duration="619000" />
+      <workItem from="1681663192853" duration="1205000" />
     </task>
     <servers />
   </component>

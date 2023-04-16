@@ -7,6 +7,12 @@
             "label": "pack",
             "type": "shell",
             "command": "./pack.sh"
+        },
+        {
+            "label": "Pack & Go",
+            "type": "shell",
+            "command": "./pack.sh && gnome-extensions install --force customreboot@nova1545.shell-extension.zip",
+            "problemMatcher": []
         }
     ]
 }
