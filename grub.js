@@ -140,7 +140,14 @@ async function enableQuickReboot() {
     try {
         let [status, user, stderr] = await Utils.execCommand(['/usr/bin/whoami'],);
     
-        [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/cp', `/home/${user.trim()}/.local/share/gnome-shell/extensions/customreboot@nova1545/42_custom_reboot`, '/etc/grub.d/42_custom_reboot'],);
+        [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', `/home/${user.trim()}/.local/share/gnome-shell/extensions/customreboot@nova1545/install_custom_reboot_grub`, user.trim()],);
+        if (status !== 0) {
+            Utils._logWarning(`Failed to copy 42_custom_reboot to /etc/grub.d`);
+            return false;
+        }
+        Utils._log(`Copied 42_custom_reboot to /etc/grub.d`);
+
+        /*[status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/cp', `/home/${user.trim()}/.local/share/gnome-shell/extensions/customreboot@nova1545/42_custom_reboot`, '/etc/grub.d/42_custom_reboot'],);
         if (status !== 0) {
             Utils._logWarning(`Failed to copy 42_custom_reboot to /etc/grub.d`);
             return false;
@@ -157,7 +164,7 @@ async function enableQuickReboot() {
         if (status !== 0) {
             Utils._logWarning(`Failed to update grub`);
             return false;
-        }
+        }*/
 
         return true;
     }
@@ -174,7 +181,18 @@ async function enableQuickReboot() {
  */
 async function disableQuickReboot() {
     try {
-        let [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/rm', '/etc/grub.d/42_custom_reboot'],);
+
+        let [status, user, stderr] = await Utils.execCommand(['/usr/bin/whoami'],);
+    
+        [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', `/home/${user.trim()}/.local/share/gnome-shell/extensions/customreboot@nova1545/remove_custom_reboot_grub`],);
+        if (status !== 0) {
+            Utils._logWarning(`Failed to delete 42_custom_reboot from /etc/grub.d`);
+            return false;
+        }
+        Utils._log(`Removed 42_custom_reboot from /etc/grub.d`);
+
+
+        /*let [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/rm', '/etc/grub.d/42_custom_reboot'],);
         if (status !== 0) {
             Utils._logWarning(`Failed to remove /etc/grub.d/42_custom_reboot`);
             return false;
@@ -185,7 +203,7 @@ async function disableQuickReboot() {
         if (status !== 0) {
             Utils._logWarning(`Failed to update grub`);
             return false;
-        }
+        }*/
 
         return true;
     }
