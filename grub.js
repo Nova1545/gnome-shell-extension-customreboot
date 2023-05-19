@@ -1,42 +1,19 @@
-/* grub.js
- *
- * Copyright (C) 2020
- *      Daniel Shchur (DocQuantum) <shchurgood@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const ByteArray = imports.byteArray;
 
-
 /**
- * getBootOptions:
- * @returns {[Map, String]} Map(title, title), defaultOption
- * 
- * Parses the grub config to get the currently configured
- * menuentries.
- * defaultOption is set to the first menuentry
+ * Represents grub
  */
-async function getBootOptions() {
+/**
+ * Get's all available boot options
+ * @returns {[Map, string]} Map(Title, id), defaultOption
+ */
+async function GetBootOptions() {
     try {
-        let cfgpath = Utils.getGrubConfig();
+        let cfgpath = this.GetConfig();
         if (cfgpath == "") {
             throw new String("Failed to find grub config");
         }
@@ -87,21 +64,15 @@ async function getBootOptions() {
 }
 
 /**
- * setBootOption:
- * 
- * @param {string} title
- * @returns {bool} whether it was able to set it or not
- * 
- * The menuentry title to be passed to grub-reboot so that that
- * boot option is set to be the one to boot off of next boot. 
+ * Set's the next boot option
+ * @param {string} id 
+ * @returns True if the boot option was set, otherwise false
  */
- async function setBootOption(title) {
+async function SetBootOption(id) {
     try {
         let [status, stdout, stderr] = await Utils.execCommand(
             ['/usr/bin/pkexec', '/usr/sbin/grub-reboot', title],
         );
-        if (status !== 0)
-            throw new String(`Failed to set boot option to ${title}:\nExitCode: ${status}\nstdout: ${stdout}\nstderr: ${stderr}`);
         Utils._log(`Set boot option to ${title}: ${status}\n${stdout}\n${stderr}`);
         return true;
     } catch (e) {
@@ -111,34 +82,37 @@ async function getBootOptions() {
 }
 
 /**
- * setReadable;
- * 
- * Attempts to make the grub.conf file readable by everyone
+ * Can we use this bootloader?
+ * @returns True if usable otherwise false
  */
-async function setReadable() {
-    try {
-        const config = Utils.getGrubConfig();
-        let [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/chmod', '644', config],);
-        if (status !== 0) {
-            Utils._logWarning(`Failed to make ${config} readable`);
-            return false;
-        }
-        Utils._log(`Made ${config} readable`);
-        return true;
-    }
-    catch (e) {
-        Utils._logWarning(e);
-        return false;
-    }
+async function IsUseable() {
+    return this.GetConfig() !== "";
 }
 
 /**
- * enableQuickReboot
- * 
+ * Get's grub config file
+ * @returns A string containing the location of the config file, if none is found returns a blank string
+ */
+async function GetConfig() {
+    let paths = ["/boot/grub/grub.cfg", "/boot/grub2/grub.cfg"];
+
+    let file;
+
+    for (let i = 0; i < paths.length; i++) {
+        file = Gio.file_new_for_path(paths[i]);
+        if (file.query_exists(null)) {
+            return paths[i];
+        }
+    }
+
+    return "";
+}
+
+/**
  * Copies a custom grub script to allow the extension to quickly reboot into another OS
  * If anyone reads this: Idk how to combine these into one pkexec call, if you do please leave a commit fixing it
  */
-async function enableQuickReboot() {
+async function EnableQuickReboot() {
     try {
         let [status, stdout, stderr] = await Utils.execCommand([
             'pkexec',
@@ -160,12 +134,10 @@ async function enableQuickReboot() {
 }
 
 /**
- * disableQuickReboot
- * 
  * Removes the script used to allow the extension to quickly reboot into another OS without waiting for grub's timeout
  * If anyone reads this: Idk how to combine these into one pkexec call, if you do please leave a commit fixing it
  */
-async function disableQuickReboot() {
+async function DisableQuickReboot() {
     try {
 
         let [status, stdout, stderr] = await Utils.execCommand([
@@ -188,11 +160,9 @@ async function disableQuickReboot() {
 }
 
 /**
- * IsQuickRebootable
- * 
  * Checks if /etc/grub.d/42_custom_reboot exists
  */
-async function isQuickRebootable() {
+async function QuickRebootEnabled() {
     try {
         let [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/cat', '/etc/grub.d/42_custom_reboot'],);
         if (status !== 0) {
@@ -207,4 +177,11 @@ async function isQuickRebootable() {
         Utils._logWarning(e);
         return false;
     }
+}
+
+/**
+ * This boot loader can be quick rebooted
+ */
+async function CanQuickReboot() {
+    return true;
 }

@@ -6,7 +6,8 @@
         {
             "label": "pack",
             "type": "shell",
-            "command": "./pack.sh"
+            "command": "./pack.sh",
+            "problemMatcher": []
         },
         {
             "label": "Pack & Go",

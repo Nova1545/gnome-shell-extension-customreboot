@@ -1,42 +1,16 @@
-/* systemdBoot.js
- *
- * Copyright (C) 2020
- *      Daniel Shchur (DocQuantum) <shchurgood@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * SPDX-License-Identifier: GPL-3.0-or-later
-*/
-
-/* exported getBootOptions, setBootOption */
-
-'use strict';
-
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
 
+
 /**
- * getBootOptions:
- * @returns {[Map, String]} Map(title, id), defaultOption
- * 
- * Runs a `bootctl list` process to get the currently
- * installed boot options in systemd-boot. This will only
- * work with the current boot, so if any new options are added,
- * they will only show up on the next boot.
+ * Represents systemd-boot (boot-ctl)
  */
-async function getBootOptions() {
-    let bootctl = Utils.getBootctlPath();
+/**
+ * Get's all available boot options
+ * @returns {[Map, string]} Map(Title, id), defaultOption
+ */
+async function GetBootOptions() {
+    let bootctl = this.GetBinary();
     if (bootctl == "") {
         Utils._log(`Failed to find bootctl binary`);
         return undefined;
@@ -88,25 +62,60 @@ async function getBootOptions() {
 }
 
 /**
- * setBootOption:
- * 
- * @param {string} id
- * @returns {bool} whether it was able to set it or not
- * 
- * The unique ID to be passed to `bootctl` so that that
- * boot option is set to be the one to boot off of next boot. 
+ * Set's the next boot option
+ * @param {string} id 
+ * @returns True if the boot option was set, otherwise false
  */
-async function setBootOption(id) {
+async function SetBootOption(id) {
     try {
         let [status, stdout, stderr] = await Utils.execCommand(
-            ['/usr/bin/pkexec', '/usr/sbin/bootctl', 'set-oneshot', id],
+            ['/usr/bin/pkexec', '/usr/sbin/grub-reboot', title],
         );
-        if (status !== 0)
-            throw new String(`Failed to set boot option to ${id}:\nExitCode: ${status}\nstdout: ${stdout}\nstderr: ${stderr}`);
-        Utils._log(`Set boot option to ${id}: ${status}\n${stdout}\n${stderr}`);
+        Utils._log(`Set boot option to ${title}: ${status}\n${stdout}\n${stderr}`);
         return true;
     } catch (e) {
         Utils._logWarning(e);
         return false;
     }
+}
+
+/**
+ * Can we use this bootloader?
+ * @returns True if usable otherwise false
+ */
+async function IsUseable() {
+    return this.GetBinary() !== "";
+}
+
+/**
+ * Get's bootctl binary path
+ * @returns A string containing the location of the binary, if none is found returns a blank string
+ */
+async function GetBinary() {
+    let paths = ["/usr/sbin/bootctl", "/usr/bin/bootctl"];
+
+    let file;
+
+    for (let i = 0; i < paths.length; i++) {
+        file = Gio.file_new_for_path(paths[i]);
+        if (file.query_exists(null)) {
+            return paths[i];
+        }
+    }
+
+    return ""; 
+}
+
+/**
+ * This boot loader cannot be quick rebooted
+ */
+async function CanQuickReboot() {
+    return false;
+}
+
+/**
+ * 
+ */
+async function QuickRebootEnabled() {
+    return false;
 }

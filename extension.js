@@ -11,10 +11,12 @@ const SystemActions = imports.misc.systemActions;
 
 // Import Utils class
 const Utils = Me.imports.utils;
+const bootloader = Me.imports.bootloader;
 
 
 const RebootQuickMenu = GObject.registerClass(
 class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
+
     _init() {
         super._init({
             label: 'Reboot Into',
@@ -29,24 +31,12 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
         this.clickedID = this.connect("clicked", () => {
             this.menu.open();
             this.checked = true;
-            /*Utils.getCurrentBootloader().setBootOption(String(0)).then(result => {
-                if (result) {
-                    new SystemActions.getDefault().activateRestart();
-                }
-                else {
-                    
-                }
-            });*/
         });
 
         // Connect 'menu-closed' to update checked state
         this.menuClosedID = this.menu.connect("menu-closed", () => {
             this.checked = false;
         });
-
-        // Set Menu Header
-        this.menu.setHeader('system-reboot-symbolic', 'Boot Options',
-            'Reboot into the selected entry');
         
         // Add boot options to menu
         this.createBootMenu();
@@ -60,23 +50,27 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
     async createBootMenu() {
         // Get boot options
-        const bootloader = Utils.getCurrentBootloader().getBootOptions().then(([bootOps, defaultOpt]) => {
+        const type = await bootloader.GetUseableType();
+
+        // Set Menu Header
+        const menu_text = `Reboot into the selected entry using ${type}`;
+        this.menu.setHeader('system-reboot-symbolic', 'Boot Options', menu_text);
+
+        const loader = await bootloader.GetUseable(type);
+        loader.GetBootOptions().then(([bootOps, defaultOpt]) => {
             if (bootOps !== undefined) {
                 this._itemsSection = new PopupMenu.PopupMenuSection();
                 let x = 0;
                 bootOps.forEach((title, id) => {
                     this._itemsSection.addAction(String(title), () => {
-                        // Get bootloader and set reboot option
-                        Utils.getCurrentBootloader().setBootOption(String(id)).then(result => {
+                        // Set boot option
+                        loader.SetBootOption(String(id)).then(result => {
                             if (result) {
                                 // On success trigger restart dialog
                                 new SystemActions.getDefault().activateRestart();
                             }
-                            else {
-                                
-                            }
                         });
-                    }, (title === defaultOpt)? "pan-end-symbolic" : undefined);
+                    }, (title === defaultOpt || id === defaultOpt)? "pan-end-symbolic" : undefined);
                     x++;
                 });
                 this.menu.addMenuItem(this._itemsSection);
@@ -89,23 +83,25 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
                 this.createBootMenu();
             });
 
-            Utils.getCurrentBootloader().isQuickRebootable().then(async result => {
-                if (!result) {
+            loader.CanQuickReboot().then(async result => {
+                if (!result) return;
+                if (!await loader.QuickRebootEnabled()) {
                     this.menu.addAction('Enable Quick Reboot', async () => {
-                        await Utils.getCurrentBootloader().enableQuickReboot();
+                        await loader.EnableQuickReboot();
                         this.menu.removeAll();
                         this.createBootMenu();
                     });
                 }
                 else {
                     this.menu.addAction('Disable Quick Reboot', async () => {
-                        await Utils.getCurrentBootloader().disableQuickReboot();
+                        await loader.DisableQuickReboot();
                         this.menu.removeAll();
                         this.createBootMenu();
                     });
                 }
             });
-        }).catch(() => {
+        }).catch((error) => {
+            Utils._log(error);
             // Only do this if the current bootloader is grub
             if (Utils.getCurrentBootloaderType() === 1)
             {
