@@ -1,9 +1,9 @@
 {
   "name": "Custom Reboot",
-  "description": "Reboot into another OS directly from GNOME.\nOriginal Version: https://github.com/docquantum/gnome-shell-extension-customreboot\nAll credit goes to Docquantum, I just ported it to GNOME 43",
+  "description": "Reboot into another OS directly from GNOME.\nA expansion of https://github.com/docquantum/gnome-shell-extension-customreboot",
   "uuid": "customreboot@nova1545",
   "original-author": "Nova1545",
-  "version": "4",
+  "version": "5",
   "url": "https://github.com/Nova1545/gnome-shell-extension-customreboot",
   "shell-version": [ "43", "44"]
 }
