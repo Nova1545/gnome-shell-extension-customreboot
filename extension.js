@@ -21,7 +21,13 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
     _init() {
         super._init({
+
+            // GNOME 44
+            title: 'Reboot Into',
+
+            // GNOME 43
             label: 'Reboot Into',
+
             iconName: 'system-reboot-symbolic',
             toggleMode: false,
         });
@@ -142,6 +148,12 @@ class Extension {
 
         // Add items to QuickSettingsMenu
         QuickSettingsMenu._addItems(this.quickSettingsItems);
+
+        // Ensure the tile(s) are above the background apps menu
+        for (const item of this.quickSettingsItems) {
+            QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
+                QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
+        }
     }
 
     disable() {
