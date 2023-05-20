@@ -5,8 +5,6 @@ const systemdBoot = Me.imports.systemdBoot;
 const efibootmgr = Me.imports.efibootmgr;
 const Utils = Me.imports.utils;
 
-const settings = ExtensionUtils.getSettings('org.gnome.shell.extensions.customreboot');
-
 
 const BootLoaders = {
     EFI: "EFI Boot Manager",
@@ -21,6 +19,7 @@ const BootLoaders = {
  * @returns BootLoaders type. Can be "EFI", "SYSD", "GRUB", or "UNKNOWN"
  */
 async function GetUseableType() {
+    const settings = ExtensionUtils.getSettings('org.gnome.shell.extensions.customreboot');
     if (await efibootmgr.IsUseable() && settings.get_boolean('use-efibootmgr')) return BootLoaders.EFI;
     if (await grub.IsUseable() && settings.get_boolean('use-grub')) return BootLoaders.GRUB;
     if (await systemdBoot.IsUseable() && settings.get_boolean('use-systemd-boot')) return BootLoaders.SYSD;

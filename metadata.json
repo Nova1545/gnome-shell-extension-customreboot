@@ -3,7 +3,7 @@
   "description": "Reboot into another OS directly from GNOME.\nA expansion of https://github.com/docquantum/gnome-shell-extension-customreboot",
   "uuid": "customreboot@nova1545",
   "original-author": "Nova1545",
-  "version": "5",
+  "version": "6",
   "url": "https://github.com/Nova1545/gnome-shell-extension-customreboot",
   "shell-version": [ "43", "44"]
 }

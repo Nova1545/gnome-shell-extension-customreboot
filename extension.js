@@ -9,7 +9,6 @@ const PopupMenu = imports.ui.popupMenu;
 const QuickSettings = imports.ui.quickSettings;
 const SystemActions = imports.misc.systemActions;
 const Gio = imports.gi.Gio;
-const GioSSS = Gio.SettingsSchemaSource;
 
 const Config = imports.misc.config;
 
@@ -144,7 +143,8 @@ class Extension {
         // Add items to QuickSettingsMenu
         QuickSettingsMenu._addItems(this.quickSettingsItems);
 
-        // Ensure the tile(s) are above the background apps menu
+        // Ensure the tile(s) are above the background apps menu (Only running when GNOME 44 is detected)
+        if (Config.PACKAGE_VERSION.startsWith("43")) return;
         for (const item of this.quickSettingsItems) {
             QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
                 QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
