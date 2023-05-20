@@ -13,7 +13,7 @@ const ByteArray = imports.byteArray;
  */
 async function GetBootOptions() {
     try {
-        let cfgpath = this.GetConfig();
+        let cfgpath = await this.GetConfig();
         if (cfgpath == "") {
             throw new String("Failed to find grub config");
         }
@@ -86,7 +86,7 @@ async function SetBootOption(id) {
  * @returns True if usable otherwise false
  */
 async function IsUseable() {
-    return this.GetConfig() !== "";
+    return await this.GetConfig() !== "";
 }
 
 /**

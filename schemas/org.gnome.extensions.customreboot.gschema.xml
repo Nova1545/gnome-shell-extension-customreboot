@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.customreboot" path="/org/gnome/shell/extensions/customreboot/">
+    <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->
+    <key name="use-efibootmgr" type="b">
+      <default>true</default>
+    </key>
+    <key name="use-grub" type="b">
+      <default>false</default>
+    </key>
+    <key name="use-systemd-boot" type="b">
+      <default>false</default>
+    </key>
+  </schema>
+</schemalist>

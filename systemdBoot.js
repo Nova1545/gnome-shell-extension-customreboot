@@ -10,7 +10,7 @@ const Utils = Me.imports.utils;
  * @returns {[Map, string]} Map(Title, id), defaultOption
  */
 async function GetBootOptions() {
-    let bootctl = this.GetBinary();
+    let bootctl = await this.GetBinary();
     if (bootctl == "") {
         Utils._log(`Failed to find bootctl binary`);
         return undefined;
@@ -84,7 +84,7 @@ async function SetBootOption(id) {
  * @returns True if usable otherwise false
  */
 async function IsUseable() {
-    return this.GetBinary() !== "";
+    return await this.GetBinary() !== "";
 }
 
 /**

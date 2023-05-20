@@ -8,6 +8,8 @@ const { GObject } = imports.gi;
 const PopupMenu = imports.ui.popupMenu;
 const QuickSettings = imports.ui.quickSettings;
 const SystemActions = imports.misc.systemActions;
+const Gio = imports.gi.Gio;
+const GioSSS = Gio.SettingsSchemaSource;
 
 // Import Utils class
 const Utils = Me.imports.utils;
@@ -53,10 +55,20 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
         const type = await bootloader.GetUseableType();
 
         // Set Menu Header
-        const menu_text = `Reboot into the selected entry using ${type}`;
-        this.menu.setHeader('system-reboot-symbolic', 'Boot Options', menu_text);
+        this.menu.setHeader('system-reboot-symbolic', 'Boot Options', 'Reboot into the selected entry');
 
         const loader = await bootloader.GetUseable(type);
+
+        if (loader === undefined) {
+            // Add reload option, to refresh extension menu without reloading GNOME or the extension
+            this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+            this.menu.addAction('Reload', () => {
+                this.menu.removeAll();
+                this.createBootMenu();
+            });
+            return;
+        }
+
         loader.GetBootOptions().then(([bootOps, defaultOpt]) => {
             if (bootOps !== undefined) {
                 this._itemsSection = new PopupMenu.PopupMenuSection();
@@ -100,6 +112,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
                     });
                 }
             });
+
         }).catch((error) => {
             Utils._log(error);
             // Only do this if the current bootloader is grub
