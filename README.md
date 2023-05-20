@@ -1,22 +1,22 @@
 # Custom Reboot GNOME Shell Extension
-A port of https://github.com/docquantum/gnome-shell-extension-customreboot to GNOME 43.
-
-This extension uses all the original code for interacting with grub and bootctl. I simply ported it to GNOME 43
+A expansion of https://github.com/docquantum/gnome-shell-extension-customreboot (Port to GNOME 43 and additional features)
 
 ---
 
-![Example](https://cdn.novastudios.uk/public/GNOMEExtension.png)
+TODO: Update example
 
 | Bootloader   | Supported |
 | ------------ | --------- |
 | systemd-boot | Yes       |
 | GRUB         | Yes       |
+| efibootmgr   | Yes       |
 
 A gnome-shell extension to add a "Custom Restart..." option to the shell system panel that allows you to choose what OS you want to boot into, after which it triggers the typical end session dialog for restart.
 
 This extension needs permissions for gnome-shell to read your `/boot` partition, please verify your Linux distribution documentation.
 
 There is now a button in the dropdown to make `grub.conf` readable (Requires authorization)
+** This is known to not work on fedora. Please use `efibootmgr`
 
 ## Installing
 Recommended:
@@ -24,8 +24,10 @@ Recommended:
 
 Alternate Option:
 1. Download from [releases](https://github.com/Nova1545/gnome-shell-extension-customreboot/releases)
-2. Open a terminal where you downloaded the extension to and run `gnome-extensions install customreboot@nova1545.shell-extension.zip` 
+2. Open a terminal where you downloaded the extension to and run (Add `--force` if updating) `gnome-extensions install customreboot@nova1545.shell-extension.zip` 
 
+#### (Post-Install) Set Boot loader options
+Open the extensions settings and choose from `efibootmgr` (default), `grub`, and `systemd-boot`. The extension will try all enabled boot loaders in the order show in the settings window, until one is found that works.
 
 ## Systemd-boot
 
@@ -43,8 +45,15 @@ The presented options are parsed from the grub config.
 
 When you select the operating system to reboot into, you'll be required to input your password because of required permissions to run `grub-reboot`.
 
+## efibootmgr (New)
+It's able to set the default using `efibootmgr -n 0001`
+
+The presented options are parsed from `efibootmgr`
+
+When you select the operating system to reboot into, you'll be required to input your password because of required permissions to run `efibootmgr` which set EFI variables.
+
 ## Caveats
 
-I've only tested this on Ubuntu Linux running gnome 43 and grub. Please let me know if you run into issues on other distros, bootloaders, and GNOME shell versions.
+I've only tested this on Ubuntu running GNOME 43 and GRUB. Please let me know if you run into issues on other distros, bootloaders, and GNOME shell versions.
 
 Pull requests welcome!
