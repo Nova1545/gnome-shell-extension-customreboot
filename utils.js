@@ -29,7 +29,7 @@ const SystemdBoot = Me.imports.systemdBoot;
 const Grub = Me.imports.grub;
 const Gio = imports.gi.Gio;
 
-var DEBUG = true;
+var DEBUG = false;
 
 const BootLoaderType = {
     SYSTEMD_BOOT : 0,
