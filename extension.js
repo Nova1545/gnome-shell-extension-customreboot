@@ -11,6 +11,8 @@ const SystemActions = imports.misc.systemActions;
 const Gio = imports.gi.Gio;
 const GioSSS = Gio.SettingsSchemaSource;
 
+const Config = imports.misc.config;
+
 // Import Utils class
 const Utils = Me.imports.utils;
 const bootloader = Me.imports.bootloader;
@@ -20,17 +22,10 @@ const RebootQuickMenu = GObject.registerClass(
 class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
     _init() {
-        super._init({
-
-            // GNOME 44
-            title: 'Reboot Into',
-
-            // GNOME 43
-            label: 'Reboot Into',
-
-            iconName: 'system-reboot-symbolic',
-            toggleMode: false,
-        });
+        const init_params = { iconName: 'system-reboot-symbolic', toggleMode: false };
+        if (Config.PACKAGE_VERSION.startsWith("43")) init_params.label = "Reboot Into";
+        if (Config.PACKAGE_VERSION.startsWith("44")) init_params.title = "Reboot Into";
+        super._init(init_params);
 
         // Set toggle to be unchecked
         this.checked = false;
