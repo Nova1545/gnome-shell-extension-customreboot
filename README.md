@@ -26,6 +26,16 @@ Alternate Option:
 1. Download from [releases](https://github.com/Nova1545/gnome-shell-extension-customreboot/releases)
 2. Open a terminal where you downloaded the extension to and run (Add `--force` if updating) `gnome-extensions install customreboot@nova1545.shell-extension.zip` 
 
+## Installing from Source 
+``` bash
+git clone https://github.com/Nova1545/gnome-shell-extension-customreboot.git
+cd gnome-shell-extension-customreboot
+chmod +x pack.sh
+./pack.sh
+gnome-extensions install --force customreboot@nova1545.shell-extension.zip
+```
+
+
 #### (Post-Install) Set Boot loader options
 Open the extensions settings and choose from `efibootmgr` (default), `grub`, and `systemd-boot`. The extension will try all enabled boot loaders in the order show in the settings window, until one is found that works.
 
