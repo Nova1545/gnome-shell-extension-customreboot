@@ -54,18 +54,29 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
         // Get boot options
         const type = await bootloader.GetUseableType();
 
+        const header_title = `Boot Options - ${type}`;
+
         // Set Menu Header
-        this.menu.setHeader('system-reboot-symbolic', 'Boot Options', 'Reboot into the selected entry');
+        this.menu.setHeader('system-reboot-symbolic', header_title, 'Reboot into the selected entry');
 
         const loader = await bootloader.GetUseable(type);
 
         if (loader === undefined) {
+            // Set Menu Header
+            this.menu.setHeader('system-reboot-symbolic', 'Error', 'The selected boot loader cannot be found...');
+
             // Add reload option, to refresh extension menu without reloading GNOME or the extension
             this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
             this.menu.addAction('Reload', () => {
                 this.menu.removeAll();
                 this.createBootMenu();
             });
+
+            // Add button to open settings
+            this.menu.addAction('Settings', () => {
+                ExtensionUtils.openPrefs();
+            });
+
             return;
         }
 
@@ -93,6 +104,11 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
             this.menu.addAction('Reload', () => {
                 this.menu.removeAll();
                 this.createBootMenu();
+            });
+
+            // Add button to open settings
+            this.menu.addAction('Settings', () => {
+                ExtensionUtils.openPrefs();
             });
 
             loader.CanQuickReboot().then(async result => {

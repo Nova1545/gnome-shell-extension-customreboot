@@ -4,6 +4,11 @@ const { Adw, Gio, Gtk } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
+const Utils = Me.imports.utils;
+
+const grub_ = Me.imports.grub;
+const systemdBoot = Me.imports.systemdBoot;
+const efibootmgr = Me.imports.efibootmgr;
 
 function init() {
 
@@ -89,4 +94,16 @@ function fillPreferencesWindow(window) {
 
     // Add our page to the window
     window.add(page);
+
+    (async () => {
+        // Disable/enable switches in accordance to them being usable
+
+        Utils._log(await efibootmgr.IsUseable());
+        Utils._log(await grub_.IsUseable());
+        Utils._log(await systemdBoot.IsUseable());
+
+        efi_switch.set_sensitive(await efibootmgr.IsUseable());
+        grub_switch.set_sensitive(await grub_.IsUseable());
+        sysd_switch.set_sensitive(await systemdBoot.IsUseable());
+    })();
 }
