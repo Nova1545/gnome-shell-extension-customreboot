@@ -72,8 +72,8 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
         loader.GetBootOptions().then(([bootOps, defaultOpt]) => {
             if (bootOps !== undefined) {
                 this._itemsSection = new PopupMenu.PopupMenuSection();
-                let x = 0;
-                bootOps.forEach((title, id) => {
+
+                for (let [title, id] of bootOps) {
                     this._itemsSection.addAction(String(title), () => {
                         // Set boot option
                         loader.SetBootOption(String(id)).then(result => {
@@ -83,8 +83,8 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
                             }
                         });
                     }, (title === defaultOpt || id === defaultOpt)? "pan-end-symbolic" : undefined);
-                    x++;
-                });
+                }
+
                 this.menu.addMenuItem(this._itemsSection);
             }
 

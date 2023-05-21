@@ -1,12 +1,13 @@
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Me.imports.utils;
+const Gio = imports.gi.Gio;
 
 /**
  * Get's all available boot options
  * @returns {[Map, string]} Map(Title, id), defaultOption
  */
 async function GetBootOptions() {
-    const [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/efibootmgr'],);
+    const [status, stdout, stderr] = await Utils.execCommand(['efibootmgr'],);
     const lines = stdout.split("\n");
 
     let boot_first = "0000";
@@ -24,7 +25,14 @@ async function GetBootOptions() {
         const vLine = regex.exec(line)
         if (vLine && vLine.length) {
             const option = line.replace("Boot", "").split("*");
-            boot_options.set(option[0].trim(), option[1].trim());
+            const title = option[1];
+            if (title.includes("HD") || title.includes("RC")) {
+                const trimed_title = title.replace(/(?<=[\S\s]*)(HD|RC)([\s\S()]*|$)/, "").trim();
+                boot_options.set(trimed_title, option[0].trim());
+            }
+            else {
+                boot_options.set(option[1].trim(), option[0].trim());
+            }
         }
     }
 
@@ -37,7 +45,7 @@ async function GetBootOptions() {
  * @returns True if the boot option was set, otherwise false
  */
 async function SetBootOption(id) {
-    const [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', '/usr/bin/efibootmgr', '-n', id],);
+    const [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', 'efibootmgr', '-n', id],);
     if (status === 0) {
         Utils._log(`Set boot option to ${id}`);
         return true;
@@ -51,7 +59,7 @@ async function SetBootOption(id) {
  * @returns True if usable otherwise false
  */
 async function IsUseable() {
-    let [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/efibootmgr'],);
+    let [status, stdout, stderr] = await Utils.execCommand(['efibootmgr'],);
     return status === 0;
 }
 

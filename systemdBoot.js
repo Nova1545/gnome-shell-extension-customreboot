@@ -69,9 +69,9 @@ async function GetBootOptions() {
 async function SetBootOption(id) {
     try {
         let [status, stdout, stderr] = await Utils.execCommand(
-            ['/usr/bin/pkexec', '/usr/sbin/grub-reboot', title],
+            ['/usr/bin/pkexec', '/usr/sbin/grub-reboot', id],
         );
-        Utils._log(`Set boot option to ${title}: ${status}\n${stdout}\n${stderr}`);
+        Utils._log(`Set boot option to ${id}: ${status}\n${stdout}\n${stderr}`);
         return true;
     } catch (e) {
         Utils._logWarning(e);
