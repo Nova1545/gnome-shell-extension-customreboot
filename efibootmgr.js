@@ -59,8 +59,12 @@ async function SetBootOption(id) {
  * @returns True if usable otherwise false
  */
 async function IsUseable() {
-    let [status, stdout, stderr] = await Utils.execCommand(['efibootmgr'],);
-    return status === 0;
+    try {
+        let [status, stdout, stderr] = await Utils.execCommand(['efibootmgr'],);
+        return status === 0;
+    } catch (e) {
+        return false;
+    }
 }
 
 /**
