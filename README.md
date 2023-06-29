@@ -16,7 +16,9 @@ A gnome-shell extension to add a "Custom Restart..." option to the shell system 
 This extension needs permissions for gnome-shell to read your `/boot` partition, please verify your Linux distribution documentation.
 
 There is now a button in the dropdown to make `grub.conf` readable (Requires authorization)
-** This is known to not work on fedora. Please use `efibootmgr`
+
+## Known Limitations
+The GRUB reboot option is known to not work on Fedora or any Arch based distro. Please use `efibootmgr` or `systemdboot`
 
 ## Installing
 Recommended:
