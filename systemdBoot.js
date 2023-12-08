@@ -1,6 +1,6 @@
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Utils = Me.imports.utils;
-const Gio = imports.gi.Gio;
+import * as Utils from "./utils.js";
+import GLib from 'gi://GLib';
+import Gio from "gi://Gio";
 
 
 /**

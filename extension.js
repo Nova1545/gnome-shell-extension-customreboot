@@ -1,20 +1,19 @@
-const QuickSettingsMenu = imports.ui.main.panel.statusArea.quickSettings;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import * as QuickSettings from 'resource:///org/gnome/shell/ui/quickSettings.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
 
-
-const { GObject } = imports.gi;
-const PopupMenu = imports.ui.popupMenu;
-const QuickSettings = imports.ui.quickSettings;
-const SystemActions = imports.misc.systemActions;
-const Gio = imports.gi.Gio;
-
-const Config = imports.misc.config;
+import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
+import { getDefault } from "resource:///org/gnome/shell/misc/systemActions.js";
+import Gio from "gi://Gio";
+import GObject from "gi://GObject";
+import { PACKAGE_VERSION } from "resource:///org/gnome/shell/misc/config.js";
 
 // Import Utils class
-const Utils = Me.imports.utils;
-const bootloader = Me.imports.bootloader;
+
+//import  
+import * as Utils from "./utils.js";
+import * as bootloader from "./bootloader.js";
 
 
 const RebootQuickMenu = GObject.registerClass(
@@ -22,8 +21,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
     _init() {
         const init_params = { iconName: 'system-reboot-symbolic', toggleMode: false };
-        if (Config.PACKAGE_VERSION.startsWith("43")) init_params.label = "Reboot Into";
-        if (Config.PACKAGE_VERSION.startsWith("44")) init_params.title = "Reboot Into";
+        init_params.title = "Reboot Into";
         super._init(init_params);
 
         // Set toggle to be unchecked
@@ -41,7 +39,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
         });
         
         // Add boot options to menu
-        this.createBootMenu();
+        //this.createBootMenu();
     }
 
     cleanConns() {
@@ -82,7 +80,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
         loader.GetBootOptions().then(([bootOps, defaultOpt]) => {
             if (bootOps !== undefined) {
-                this._itemsSection = new PopupMenu.PopupMenuSection();
+                this._itemsSection = new PopupMenuSection();
 
                 for (let [title, id] of bootOps) {
                     this._itemsSection.addAction(String(title), () => {
@@ -90,7 +88,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
                         loader.SetBootOption(String(id)).then(result => {
                             if (result) {
                                 // On success trigger restart dialog
-                                new SystemActions.getDefault().activateRestart();
+                                new getDefault().activateRestart();
                             }
                         });
                     }, (title === defaultOpt || id === defaultOpt)? "pan-end-symbolic" : undefined);
@@ -108,7 +106,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
             // Add button to open settings
             this.menu.addAction('Settings', () => {
-                ExtensionUtils.openPrefs();
+                Extension.openPrefs();
             });
 
             loader.CanQuickReboot().then(async result => {
@@ -135,7 +133,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
             if (Utils.getCurrentBootloaderType() === 1)
             {
                 // Only add this if all fails, giving user option to make the config readable
-                this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+                this.menu.addMenuItem(new PopupSeparatorMenuItem());
                 this.menu.addAction('Fix Grub.conf Perms', async () => {
                     await Utils.getCurrentBootloader().setReadable();
                     this.menu.removeAll();
@@ -146,25 +144,23 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
     }
 });
 
-class Extension {
+export default class CustomReboot extends Extension {
     constructor() {
-        this.quickSettingsItems = [];
     }
 
     
     enable() {
-        // Add menu to the items list
-        this.quickSettingsItems.push(new RebootQuickMenu());
-
         // Add items to QuickSettingsMenu
-        QuickSettingsMenu._addItems(this.quickSettingsItems);
+        this._indicator = new QuickSettings.SystemIndicator(this);
+        this._indicator.quickSettingsItems.push(new RebootQuickMenu());
+        Main.panel.statusArea.quickSettings.addExternalIndicator(this._indicator);
 
         // Ensure the tile(s) are above the background apps menu (Only running when GNOME 44 is detected)
-        if (Config.PACKAGE_VERSION.startsWith("43")) return;
+        /*if (PACKAGE_VERSION.startsWith("43")) return;
         for (const item of this.quickSettingsItems) {
-            QuickSettingsMenu.menu._grid.set_child_below_sibling(item,
-                QuickSettingsMenu._backgroundApps.quickSettingsItems[0]);
-        }
+            QuickSettings.menu._grid.set_child_below_sibling(item,
+                QuickSettings._backgroundApps.quickSettingsItems[0]);
+        }*/
     }
 
     disable() {
@@ -172,10 +168,5 @@ class Extension {
             item.cleanConns();
             item.destroy();
         });
-        this.quickSettingsItems = [];
     }
-}
-
-function init() {
-    return new Extension();
 }

@@ -22,12 +22,12 @@
 /* exports execCommand, getCurrentBootloader, getBootLoaderName,
             setDebug, _log, _logWarning */
 
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-// const Prefs = Me.imports.prefs;
+import GLib from 'gi://GLib';
+import Gio from "gi://Gio";
 
-const SystemdBoot = Me.imports.systemdBoot;
-const Grub = Me.imports.grub;
-const Gio = imports.gi.Gio;
+import * as Grub from "./grub.js";
+import * as SystemdBoot from "./systemdBoot.js";
+import * as efibootmgr from "./efibootmgr.js";
 
 var DEBUG = true;
 
@@ -47,7 +47,7 @@ const BootLoaderClass = {
  * 
  * Returns the path of the bootctl binary or an empty string if not found
  */
-function getBootctlPath() {
+export function getBootctlPath() {
     let paths = ["/usr/sbin/bootctl", "/usr/bin/bootctl"];
 
     let file;
@@ -68,7 +68,7 @@ function getBootctlPath() {
  * 
  * Returns the path of the grub config or an empty string if not exist
  */
-function getGrubConfig() {
+export function getGrubConfig() {
     let paths = ["/boot/grub/grub.cfg", "/boot/grub2/grub.cfg"];
 
     let file;
@@ -90,7 +90,7 @@ function getGrubConfig() {
  * Returns the current bootloader based on system configuration
  * and setting preferences.
  */
-function getCurrentBootloader() {
+export function getCurrentBootloader() {
     return BootLoaderClass[getCurrentBootloaderType()];
 }
 
@@ -101,7 +101,7 @@ function getCurrentBootloader() {
  * Returns the current bootloader based on system configuration
  * and setting preferences.
  */
- function getCurrentBootloaderType() {
+export function getCurrentBootloaderType() {
     // If there is a grub config, use grub-reboot, otherwise use systemdboot
     
     let grubcfg = getGrubConfig();
@@ -120,7 +120,7 @@ function getCurrentBootloader() {
  * 
  * Given a bootloader type, returns the name in string form.
  */
-function getBootLoaderName(type) {
+export function getBootLoaderName(type) {
     return Object.keys(BootLoaderType)[type];
 }
 
@@ -135,7 +135,7 @@ function getBootLoaderName(type) {
  * 
  * Executes a command asynchronously.
  */
-function execCommand(argv, input = null, cancellable = null) {
+export function execCommand(argv, input = null, cancellable = null) {
     let flags = Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE;
 
     if (input !== null)

@@ -1,12 +1,12 @@
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Utils = Me.imports.utils;
-const Gio = imports.gi.Gio;
+import * as Utils from "./utils.js";
+import GLib from 'gi://GLib';
+import Gio from "gi://Gio";
 
 /**
  * Get's all available boot options
  * @returns {[Map, string]} Map(Title, id), defaultOption
  */
-async function GetBootOptions() {
+export async function GetBootOptions() {
     const [status, stdout, stderr] = await Utils.execCommand(['efibootmgr'],);
     const lines = stdout.split("\n");
 
@@ -44,7 +44,7 @@ async function GetBootOptions() {
  * @param {string} id 
  * @returns True if the boot option was set, otherwise false
  */
-async function SetBootOption(id) {
+export async function SetBootOption(id) {
     const [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/pkexec', 'efibootmgr', '-n', id],);
     if (status === 0) {
         Utils._log(`Set boot option to ${id}`);
@@ -58,7 +58,7 @@ async function SetBootOption(id) {
  * Can we use this bootloader?
  * @returns True if usable otherwise false
  */
-async function IsUseable() {
+export async function IsUseable() {
     let [status, stdout, stderr] = await Utils.execCommand(['efibootmgr'],);
     return status === 0;
 }
@@ -66,13 +66,13 @@ async function IsUseable() {
 /**
  * This boot loader cannot be quick rebooted
  */
-async function CanQuickReboot() {
+export async function CanQuickReboot() {
     return false;
 }
 
 /**
  * 
  */
-async function QuickRebootEnabled() {
+export async function QuickRebootEnabled() {
     return false;
 }

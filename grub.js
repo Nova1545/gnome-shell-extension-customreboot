@@ -1,8 +1,6 @@
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-const Utils = Me.imports.utils;
-const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
-const ByteArray = imports.byteArray;
+import * as Utils from "./utils.js";
+import GLib from 'gi://GLib';
+import Gio from "gi://Gio";
 
 /**
  * Represents grub
@@ -11,7 +9,7 @@ const ByteArray = imports.byteArray;
  * Get's all available boot options
  * @returns {[Map, string]} Map(Title, id), defaultOption
  */
-async function GetBootOptions() {
+export async function GetBootOptions() {
     try {
         let cfgpath = await this.GetConfig();
         if (cfgpath == "") {
@@ -30,7 +28,7 @@ async function GetBootOptions() {
 
         let lines;
         if (content instanceof Uint8Array) {
-            lines = ByteArray.toString(content);
+            lines = new TextDecoder().decode(content);
         }
         else {
             lines = content.toString();
@@ -68,7 +66,7 @@ async function GetBootOptions() {
  * @param {string} id 
  * @returns True if the boot option was set, otherwise false
  */
-async function SetBootOption(id) {
+export async function SetBootOption(id) {
     try {
         let [status, stdout, stderr] = await Utils.execCommand(
             ['/usr/bin/pkexec', '/usr/sbin/grub-reboot', id],
@@ -85,7 +83,7 @@ async function SetBootOption(id) {
  * Can we use this bootloader?
  * @returns True if usable otherwise false
  */
-async function IsUseable() {
+export async function IsUseable() {
     return await this.GetConfig() !== "";
 }
 
@@ -93,7 +91,7 @@ async function IsUseable() {
  * Get's grub config file
  * @returns A string containing the location of the config file, if none is found returns a blank string
  */
-async function GetConfig() {
+export async function GetConfig() {
     let paths = ["/boot/grub/grub.cfg", "/boot/grub2/grub.cfg"];
 
     let file;
@@ -112,7 +110,7 @@ async function GetConfig() {
  * Copies a custom grub script to allow the extension to quickly reboot into another OS
  * If anyone reads this: Idk how to combine these into one pkexec call, if you do please leave a commit fixing it
  */
-async function EnableQuickReboot() {
+export async function EnableQuickReboot() {
     try {
         let [status, stdout, stderr] = await Utils.execCommand([
             'pkexec',
@@ -137,7 +135,7 @@ async function EnableQuickReboot() {
  * Removes the script used to allow the extension to quickly reboot into another OS without waiting for grub's timeout
  * If anyone reads this: Idk how to combine these into one pkexec call, if you do please leave a commit fixing it
  */
-async function DisableQuickReboot() {
+export async function DisableQuickReboot() {
     try {
 
         let [status, stdout, stderr] = await Utils.execCommand([
@@ -162,7 +160,7 @@ async function DisableQuickReboot() {
 /**
  * Checks if /etc/grub.d/42_custom_reboot exists
  */
-async function QuickRebootEnabled() {
+export async function QuickRebootEnabled() {
     try {
         let [status, stdout, stderr] = await Utils.execCommand(['/usr/bin/cat', '/etc/grub.d/42_custom_reboot'],);
         if (status !== 0) {
@@ -182,6 +180,6 @@ async function QuickRebootEnabled() {
 /**
  * This boot loader can be quick rebooted
  */
-async function CanQuickReboot() {
+export async function CanQuickReboot() {
     return true;
 }
