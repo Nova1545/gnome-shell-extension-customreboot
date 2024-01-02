@@ -23,7 +23,7 @@ import GLib from 'gi://GLib';
 import Gio from "gi://Gio";
 
 
-var DEBUG = true;
+var DEBUG = false;
 
 /**
  * @param {String[]} argv 
