@@ -164,6 +164,9 @@ export default class CustomReboot extends Extension {
     disable() {
         this.menu.cleanConns();
 
+        this._indicator.quickSettingsItems.forEach(item => {
+            item.destroy();
+        });
         this._indicator.destroy();
         this._indicator = null;
     }
