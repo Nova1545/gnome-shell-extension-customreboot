@@ -3,15 +3,14 @@
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 
-import * as grub from "./grub.js";
-import * as systemdBoot from "./systemdBoot.js";
-import * as efibootmgr from "./efibootmgr.js";
-
 import * as Utils from "./utils.js";
 import GLib from 'gi://GLib';
 import Gio from "gi://Gio";
 import Adw from "gi://Adw";
 import Gtk from "gi://Gtk";
+import { EFIBootManager } from './efibootmgr.js';
+import { Grub } from './grub.js';
+import { SystemdBoot } from './systemdBoot.js';
 
 export default class MyExtensionPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -96,13 +95,9 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
         (async () => {
             // Disable/enable switches in accordance to them being usable
     
-            Utils._log(await efibootmgr.IsUseable());
-            Utils._log(await grub_.IsUseable());
-            Utils._log(await systemdBoot.IsUseable());
-    
-            efi_switch.set_sensitive(await efibootmgr.IsUseable());
-            grub_switch.set_sensitive(await grub_.IsUseable());
-            sysd_switch.set_sensitive(await systemdBoot.IsUseable());
+            efi_switch.set_sensitive(await EFIBootManager.IsUseable());
+            grub_switch.set_sensitive(await Grub.IsUseable());
+            sysd_switch.set_sensitive(await SystemdBoot.IsUseable());
         })();
     }
 }

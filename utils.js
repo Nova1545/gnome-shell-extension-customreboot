@@ -19,114 +19,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-/* exports execCommand, getCurrentBootloader, getBootLoaderName,
-            setDebug, _log, _logWarning */
-
 import GLib from 'gi://GLib';
 import Gio from "gi://Gio";
 
-import * as Grub from "./grub.js";
-import * as SystemdBoot from "./systemdBoot.js";
-import * as efibootmgr from "./efibootmgr.js";
 
 var DEBUG = true;
 
-const BootLoaderType = {
-    SYSTEMD_BOOT : 0,
-    GRUB : 1
-};
-
-const BootLoaderClass = {
-    0: SystemdBoot,
-    1: Grub
-};
-
 /**
- * getBootctlPath
- * @returns {string}
- * 
- * Returns the path of the bootctl binary or an empty string if not found
- */
-export function getBootctlPath() {
-    let paths = ["/usr/sbin/bootctl", "/usr/bin/bootctl"];
-
-    let file;
-
-    for (let i = 0; i < paths.length; i++) {
-        file = Gio.file_new_for_path(paths[i]);
-        if (file.query_exists(null)) {
-            return paths[i];
-        }
-    }
-    
-    return "";    
-}
-
-/**
- * getGrubConfig
- * @returns {string}
- * 
- * Returns the path of the grub config or an empty string if not exist
- */
-export function getGrubConfig() {
-    let paths = ["/boot/grub/grub.cfg", "/boot/grub2/grub.cfg"];
-
-    let file;
-
-    for (let i = 0; i < paths.length; i++) {
-        file = Gio.file_new_for_path(paths[i]);
-        if (file.query_exists(null)) {
-            return paths[i];
-        }
-    }
-
-    return "";
-}
-
-/**
- * getCurrentBootloader:
- * @returns {string}
- * 
- * Returns the current bootloader based on system configuration
- * and setting preferences.
- */
-export function getCurrentBootloader() {
-    return BootLoaderClass[getCurrentBootloaderType()];
-}
-
-/**
- * getCurrentBootloaderType:
- * @returns {string}
- * 
- * Returns the current bootloader based on system configuration
- * and setting preferences.
- */
-export function getCurrentBootloaderType() {
-    // If there is a grub config, use grub-reboot, otherwise use systemdboot
-    
-    let grubcfg = getGrubConfig();
-
-    if (grubcfg != "") {
-        return BootLoaderType.GRUB;
-    }
-
-    return BootLoaderType.SYSTEMD_BOOT;
-}
-
-/**
- * getBootLoaderName:
- * @param {BootLoaderType} type
- * @returns {string}
- * 
- * Given a bootloader type, returns the name in string form.
- */
-export function getBootLoaderName(type) {
-    return Object.keys(BootLoaderType)[type];
-}
-
-/**
- * execCommand:
- * 
  * @param {String[]} argv 
  * @param {String} input 
  * @param {Gio.Cancellable} cancellable
@@ -135,7 +34,7 @@ export function getBootLoaderName(type) {
  * 
  * Executes a command asynchronously.
  */
-export function execCommand(argv, input = null, cancellable = null) {
+export async function ExecCommand(argv, input = null, cancellable = null) {
     let flags = Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE;
 
     if (input !== null)
@@ -162,33 +61,30 @@ export function execCommand(argv, input = null, cancellable = null) {
 }
 
 /**
- * setDebug:
  * @param {bool} value
  * 
  * Set's whether to debug or to not.
  */
-function setDebug(value){
+export function SetDebug(value){
     DEBUG = value;
 }
 
 /**
- * _log:
- * @param {String} msg 
+ * @param {string} msg 
  * 
  * Logs general messages if debug is set to true.
  */
-function _log(msg) {
+export function Log(msg) {
     if(DEBUG)
-        log(`CustomReboot NOTE: ${msg}`);
+        console.log(`CustomReboot NOTE: ${msg}`);
 }
 
 /**
- * _logWarning:
- * @param {String} msg 
+ * @param {string} msg 
  * 
  * Logs warning messages if debug is set to true.
  */
-function _logWarning(msg) {
+export function LogWarning(msg) {
     if(DEBUG)
-        log(`CustomReboot WARN: ${msg}`);
+        console.warn(`CustomReboot WARN: ${msg}`);
 }

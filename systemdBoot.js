@@ -1,27 +1,26 @@
-import * as Utils from "./utils.js";
-import GLib from 'gi://GLib';
 import Gio from "gi://Gio";
-
+import { ExecCommand, Log, LogWarning } from './utils.js';
 
 /**
- * Represents systemd-boot (boot-ctl)
+ * Represents Systemdboot
  */
-/**
- * Get's all available boot options
- * @returns {[Map, string]} Map(Title, id), defaultOption
- */
-async function GetBootOptions() {
+export class SystemdBoot {
+  /**
+   * Get's all available boot options
+   * @returns {[Map, string]} Map(title, id), defaultOption
+   */
+  static async GetBootOptions() {
     let bootctl = await this.GetBinary();
     if (bootctl == "") {
-        Utils._log(`Failed to find bootctl binary`);
+        Log(`Failed to find bootctl binary`);
         return undefined;
     }
 
     try {
-        let [status, stdout, stderr] = await Utils.execCommand([bootctl, "list"]);
+        let [status, stdout, stderr] = await ExecCommand([bootctl, "list"]);
         if (status !== 0)
             throw new Error(`Failed to get list from bootctl: ${status}\n${stdout}\n${stderr}`);
-        Utils._log(`bootctl list: ${status}\n${stdout}\n${stderr}`);
+        Log(`bootctl list: ${status}\n${stdout}\n${stderr}`);
         let lines = String(stdout).split('\n');
         let titleRx = /(?<=title:\s+).+/;
         let idRx = /(?<=id:\s+).+/;
@@ -46,7 +45,7 @@ async function GetBootOptions() {
         }
 
         bootOptions.forEach((title, id) => {
-            Utils._log(`${id} = ${title}`);
+            Log(`${id} = ${title}`);
 
             let defaultRes = defaultRx.exec(title);
 
@@ -57,42 +56,42 @@ async function GetBootOptions() {
 
         return [bootOptions, bootOptions.get(defaultOpt)];
     } catch (e) {
-        logError(e);
+        LogWarning(e);
         return undefined;
     }
-}
+  }
 
-/**
- * Set's the next boot option
- * @param {string} id 
- * @returns True if the boot option was set, otherwise false
- */
-async function SetBootOption(id) {
+  /**
+   * Set's the next boot option
+   * @param {string} id 
+   * @returns True if the boot option was set, otherwise false
+   */
+  static async SetBootOption(id) {
     try {
-        let [status, stdout, stderr] = await Utils.execCommand(
-            ['/usr/bin/pkexec', '/usr/sbin/grub-reboot', id],
-        );
-        Utils._log(`Set boot option to ${id}: ${status}\n${stdout}\n${stderr}`);
-        return true;
+      let [status, stdout, stderr] = await ExecCommand(
+          ['/usr/bin/pkexec', '/usr/sbin/grub-reboot', id],
+      );
+      Log(`Set boot option to ${id}: ${status}\n${stdout}\n${stderr}`);
+      return true;
     } catch (e) {
-        Utils._logWarning(e);
-        return false;
+      LogWarning(e);
+      return false;
     }
-}
+  }
 
-/**
- * Can we use this bootloader?
- * @returns True if usable otherwise false
- */
-async function IsUseable() {
+  /**
+   * Can we use this bootloader?
+   * @returns True if useable otherwise false
+   */
+  static async IsUseable() {
     return await this.GetBinary() !== "";
-}
+  }
 
-/**
- * Get's bootctl binary path
- * @returns A string containing the location of the binary, if none is found returns a blank string
- */
-async function GetBinary() {
+  /**
+   * Get's bootctl binary path
+   * @returns A string containing the location of the binary, if none is found returns a blank string
+   */
+  static async GetBinary() {
     let paths = ["/usr/sbin/bootctl", "/usr/bin/bootctl"];
 
     let file;
@@ -105,18 +104,19 @@ async function GetBinary() {
     }
 
     return ""; 
-}
+  }
 
-/**
- * This boot loader cannot be quick rebooted
- */
-async function CanQuickReboot() {
+  /**
+   * This boot loader cannot be quick rebooted
+   */
+  static async CanQuickReboot() {
     return false;
-}
+  }
 
-/**
- * 
- */
-async function QuickRebootEnabled() {
+  /**
+   * This boot loader cannot be quick rebooted
+   */ 
+  static async QuickRebootEnabled() {
     return false;
+  }
 }
