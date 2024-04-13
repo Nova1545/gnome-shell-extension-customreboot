@@ -41,16 +41,16 @@ export class SystemdBoot {
             throw new Error("Number of titles and ids do not match!");
         let bootOptions = new Map();
         for (let i = 0; i < titles.length; i++) {
-            bootOptions.set(ids[i], titles[i])
+            bootOptions.set(titles[i], ids[i])
         }
 
-        bootOptions.forEach((title, id) => {
+        bootOptions.forEach((id, title) => {
             Log(`${id} = ${title}`);
 
             let defaultRes = defaultRx.exec(title);
 
             if (defaultRes) {
-                defaultOpt = id;
+                defaultOpt = title;
             }
         })
 
@@ -66,18 +66,17 @@ export class SystemdBoot {
    * @param {string} id 
    * @returns True if the boot option was set, otherwise false
    */
-  static async SetBootOption(id) {
-    try {
-      let [status, stdout, stderr] = await ExecCommand(
-          ['/usr/bin/pkexec', '/usr/sbin/grub-reboot', id],
-      );
-      Log(`Set boot option to ${id}: ${status}\n${stdout}\n${stderr}`);
-      return true;
-    } catch (e) {
-      LogWarning(e);
-      return false;
+   static async SetBootOption(id) {
+    if (!this.IsUseable()) return false;
+    const [status, stdout, stderr] = await ExecCommand(['/usr/bin/pkexec', '/usr/bin/bootctl', 'set-oneshot', id],);
+    if (status === 0) {
+        Log(`Set boot option to ${id}`);
+        return true;
     }
+    LogWarning("Unable to set boot option using bootctl");
+    return false;
   }
+
 
   /**
    * Can we use this bootloader?
