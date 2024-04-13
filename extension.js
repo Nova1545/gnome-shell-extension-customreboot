@@ -5,14 +5,10 @@ import * as QuickSettings from 'resource:///org/gnome/shell/ui/quickSettings.js'
 
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 import { getDefault } from "resource:///org/gnome/shell/misc/systemActions.js";
-import Gio from "gi://Gio";
 import GObject from "gi://GObject";
-import { PACKAGE_VERSION } from "resource:///org/gnome/shell/misc/config.js";
-
-// Import Utils class
 
 //import  
-import { SetDebug, LogWarning, Log } from './utils.js';
+import { LogWarning, Log } from './utils.js';
 import { BootLoaders, Bootloader } from "./bootloader.js";
 
 
@@ -55,7 +51,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
     async createBootMenu(extension) {
         // Get boot options
-        const type = await Bootloader.GetUseableType();
+        const type = await Bootloader.GetUseableType(extension);
 
 
         const header_title = `Boot Options - ${type}`;
@@ -163,6 +159,7 @@ export default class CustomReboot extends Extension {
 
     disable() {
         this.menu.cleanConns();
+        this.menu = null;
 
         this._indicator.quickSettingsItems.forEach(item => {
             item.destroy();
