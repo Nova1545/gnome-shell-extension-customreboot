@@ -71,7 +71,7 @@ export class EFIBootManager {
    * @returns A string containing the location of the binary, if none is found returns a blank string
    */
   static async GetBinary() {
-    let paths = ["/usr/bin/efibootmgr"];
+    let paths = ["/usr/bin/efibootmgr", "/usr/sbin/efibootmgr"];
 
     let file;
 
