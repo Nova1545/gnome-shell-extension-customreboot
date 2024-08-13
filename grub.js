@@ -54,7 +54,6 @@ export class Grub {
       if (defualtEn == "") defualtEn = bootOptions.keys().next().value;
 
       return [bootOptions, defualtEn];
-          
     } catch (e) {
       LogWarning(e);
       return undefined;
@@ -110,13 +109,13 @@ export class Grub {
    * Copies a custom grub script to allow the extension to quickly reboot into another OS
    * If anyone reads this: Idk how to combine these into one pkexec call, if you do please leave a commit fixing it
    */
-  static async EnableQuickReboot(ext) {
+  static async EnableQuickReboot(extension) {
     try {
       let [status, stdout, stderr] = await ExecCommand([
           'pkexec',
           'sh',
           '-c',
-          `/usr/bin/cp ${ext.lookupByUUID('customreboot@nova1545').path()}/42_custom_reboot /etc/grub.d/42_custom_reboot && /usr/bin/chmod 755 /etc/grub.d/42_custom_reboot && /usr/sbin/update-grub`
+          `/usr/bin/cp ${extension.metadata.path}/42_custom_reboot /etc/grub.d/42_custom_reboot && /usr/bin/chmod 755 /etc/grub.d/42_custom_reboot && /usr/sbin/update-grub`
         ]);
 
       if (status !== 0) {
@@ -130,7 +129,6 @@ export class Grub {
         return false;
     }
   }
-  
 
   /**
    * Removes the script used to allow the extension to quickly reboot into another OS without waiting for grub's timeout

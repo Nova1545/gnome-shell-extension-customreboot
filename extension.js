@@ -22,7 +22,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
         // Set toggle to be unchecked
         this.checked = false;
-        
+
         // Open menu and set toggle check to true
         this.clickedID = this.connect("clicked", () => {
             this.menu.open();
@@ -33,14 +33,10 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
         this.menuClosedID = this.menu.connect("menu-closed", () => {
             this.checked = false;
         });
-        
+
         // Add boot options to menu
-        try {
-            this.createBootMenu(extension);
-        }
-        catch (e) {
-            LogWarning(e);
-        }
+        this.createBootMenu(extension)
+            .catch((reason) => LogWarning(reason));
     }
 
     cleanConns() {
@@ -67,9 +63,9 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
             // Add reload option, to refresh extension menu without reloading GNOME or the extension
             this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-            this.menu.addAction('Reload', () => {
+            this.menu.addAction('Reload', async () => {
                 this.menu.removeAll();
-                this.createBootMenu();
+                await this.createBootMenu(extension).catch((reason) => LogWarning(reason));
             });
 
             // Add button to open settings
@@ -102,9 +98,9 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 
             // Add reload option, to refresh extension menu without reloading GNOME or the extension
             this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-            this.menu.addAction('Reload', () => {
+            this.menu.addAction('Reload', async () => {
                 this.menu.removeAll();
-                this.createBootMenu();
+                await this.createBootMenu(extension).catch((reason) => LogWarning(reason));
             });
 
             // Add button to open settings
@@ -116,16 +112,16 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
                 if (!result) return;
                 if (!await loader.QuickRebootEnabled()) {
                     this.menu.addAction('Enable Quick Reboot', async () => {
-                        await loader.EnableQuickReboot(extension);
+                        await loader.EnableQuickReboot(extension).catch((reason) => LogWarning(reason));
                         this.menu.removeAll();
-                        this.createBootMenu();
+                        await this.createBootMenu(extension).catch((reason) => LogWarning(reason));
                     });
                 }
                 else {
                     this.menu.addAction('Disable Quick Reboot', async () => {
                         await loader.DisableQuickReboot();
                         this.menu.removeAll();
-                        this.createBootMenu();
+                        await this.createBootMenu(extension).catch((reason) => LogWarning(reason));
                     });
                 }
             });
@@ -140,7 +136,7 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
                 this.menu.addAction('Fix Grub.conf Perms', async () => {
                     await loader.SetReadable();
                     this.menu.removeAll();
-                    this.createBootMenu(extension);
+                    await this.createBootMenu(extension);
                 });
             }
         })
@@ -148,7 +144,6 @@ class RebootQuickMenu extends QuickSettings.QuickMenuToggle {
 });
 
 export default class CustomReboot extends Extension {
-    
     enable() {
         // Add items to QuickSettingsMenu
         this._indicator = new QuickSettings.SystemIndicator();
