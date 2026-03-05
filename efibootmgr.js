@@ -10,7 +10,9 @@ export class EFIBootManager {
    * @returns {[Map, string]} Map(title, id), defaultOption
    */
   static async GetBootOptions() {
-    const [status, stdout, stderr] = await ExecCommand(['efibootmgr'],);
+    const binary = await this.GetBinary();
+    if (!binary) return [new Map(), "0000"];
+    const [status, stdout, stderr] = await ExecCommand([binary]);
     const lines = stdout.split("\n");
 
     let boot_first = "0000";
@@ -48,8 +50,9 @@ export class EFIBootManager {
    * @returns True if the boot option was set, otherwise false
    */
   static async SetBootOption(id) {
-    if (!this.IsUseable()) return false;
-    const [status, stdout, stderr] = await ExecCommand(['/usr/bin/pkexec', 'efibootmgr', '-n', id],);
+    const binary = await this.GetBinary();
+    if (!binary) return false;
+    const [status, stdout, stderr] = await ExecCommand(['/usr/bin/pkexec', binary, '-n', id],);
     if (status === 0) {
         Log(`Set boot option to ${id}`);
         return true;
