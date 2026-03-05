@@ -5,5 +5,5 @@
   "original-author": "Nova1545",
   "version": "12",
   "url": "https://github.com/Nova1545/gnome-shell-extension-customreboot",
-  "shell-version": [ "46", "47", "48" ]
+  "shell-version": [ "46", "47", "48", "49" ]
 }
