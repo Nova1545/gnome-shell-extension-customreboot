@@ -23,7 +23,7 @@ export class SystemdBoot {
         Log(`bootctl list: ${status}\n${stdout}\n${stderr}`);
         let lines = String(stdout).split('\n');
         let titleRx = /(?<=title:\s+).+/;
-        let idRx = /(?<=id:\s+).+/;
+        let idRx = /(?<=(?:\s+|^)id:\s+).+/;
         let defaultRx = /\(default\)/;
         let titles = [];
         let ids = []
